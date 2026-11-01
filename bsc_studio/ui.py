@@ -7,7 +7,7 @@ from PySide6.QtCore import QObject, QRunnable, QThreadPool, QTimer, Qt, QUrl, Si
 from PySide6.QtGui import QColor, QDesktopServices, QIcon, QPainter, QPen, QPixmap
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileDialog, QFormLayout,
-    QFrame, QHBoxLayout, QHeaderView, QLabel, QLineEdit, QListWidget, QMainWindow,
+    QFrame, QHBoxLayout, QHeaderView, QLabel, QLineEdit, QMainWindow,
     QMessageBox, QPlainTextEdit, QProgressBar, QPushButton, QScrollArea, QSlider,
     QStackedWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
@@ -17,46 +17,16 @@ from .service import NAMES, ROLES, StudioService
 from .storage import Preferences
 from .updater import GitHubUpdater, start_installer
 
-STYLESHEET = """
-QWidget { background:#10171d; color:#e7edf2; font-family:'Segoe UI'; font-size:14px; }
-QMainWindow { background:#10171d; }
-QFrame#sidebar { background:#0b1116; border-right:1px solid #253039; }
-QListWidget { background:transparent; border:0; outline:0; padding:12px 0; }
-QListWidget::item { padding:14px 16px; margin:3px 10px; border-radius:7px; color:#9cabb7; }
-QListWidget::item:selected { background:#26372f; color:#c5e8c8; font-weight:600; }
-QLabel#brand { font-size:23px; font-weight:700; color:#d6e9bc; }
-QLabel#eyebrow { color:#8db79a; font-size:11px; font-weight:700; }
-QLabel#heading { font-size:28px; font-weight:650; }
-QLabel#subheading { color:#9dabb5; }
-QLabel#hint { color:#a9b5bd; font-size:12px; }
-QLabel#metric { font-size:27px; font-weight:650; color:#e5c67b; }
-QFrame#card { background:#172129; border:1px solid #2a363f; border-radius:10px; }
-QFrame#card QLabel { background:transparent; }
-QPushButton { border:1px solid #3b4b57; border-radius:6px; background:#202e38; padding:9px 15px; color:#e6edf2; }
-QPushButton:hover { background:#2b3e4a; }
-QPushButton:disabled { color:#74828b; background:#19232b; border-color:#25333d; }
-QPushButton#primary { background:#d4b36e; color:#121a1f; border-color:#d4b36e; font-weight:650; }
-QPushButton#primary:hover { background:#e4c580; }
-QPushButton#primary:disabled { background:#26343c; color:#7c8b94; border-color:#33434d; }
-QLineEdit,QPlainTextEdit,QComboBox { background:#0e161c; border:1px solid #35444f; border-radius:6px; padding:9px; selection-background-color:#526b54; }
-QLineEdit:focus,QPlainTextEdit:focus { border-color:#c7ad70; }
-QComboBox::drop-down { border:0; width:24px; }
-QComboBox QAbstractItemView { background:#1a2730; selection-background-color:#37513e; }
-QTableWidget { background:#131d25; alternate-background-color:#17232c; border:1px solid #2d3b46; gridline-color:#26343e; selection-background-color:#2c463a; selection-color:#eaf0eb; }
-QTableWidget::item { padding:9px; }
-QHeaderView::section { background:#202e38; color:#b3c2cc; border:0; border-bottom:1px solid #3b4a55; padding:11px; font-weight:600; }
-QTableCornerButton::section { background:#202e38; border:0; }
-QProgressBar { background:#1d2d36; border:0; border-radius:3px; height:5px; color:transparent; }
-QProgressBar::chunk { background:#d4b36e; border-radius:3px; }
-QScrollArea { border:0; }
-QScrollBar:vertical { width:10px; background:#111a21; } QScrollBar::handle:vertical { background:#3b4b57; min-height:30px; border-radius:4px; }
-QCheckBox { spacing:9px; } QCheckBox::indicator { width:17px; height:17px; }
-QSlider::groove:horizontal { background:#35444f; height:4px; } QSlider::handle:horizontal { background:#d4b36e; width:12px; margin:-5px 0; border-radius:6px; }
-QToolTip { background:#25343f; color:#f1f4f6; border:1px solid #62716a; }
-"""
+from .theme import STYLESHEET as STYLESHEET
+from .brand import BrandHeader, BrandNavigation
+from .storage import resource_dir
+
 
 
 def app_icon() -> QIcon:
+    logo = resource_dir() / "brand" / "bsc-logo.png"
+    if logo.is_file():
+        return QIcon(str(logo))
     pixmap = QPixmap(128, 128)
     pixmap.fill(QColor("#101b20"))
     painter = QPainter(pixmap)
@@ -102,7 +72,7 @@ def label(text, name="", wrap=False):
 
 
 def button(text, function, primary=False):
-    item = QPushButton(text)
+    item = QPushButton(text.upper())
     item.setCursor(Qt.CursorShape.PointingHandCursor)
     item.setObjectName("primary" if primary else "")
     def invoke():
@@ -116,7 +86,7 @@ def button(text, function, primary=False):
 
 def table(headers):
     item = QTableWidget(0, len(headers))
-    item.setHorizontalHeaderLabels(headers)
+    item.setHorizontalHeaderLabels([header.upper() for header in headers])
     item.verticalHeader().hide()
     item.setAlternatingRowColors(True)
     item.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -137,37 +107,27 @@ class MainWindow(QMainWindow):
         self.release = None
         self.setWindowTitle(f"BSC Radio Studio · {__version__}")
         self.setWindowIcon(app_icon())
-        self.resize(1250, 840)
-        self.setMinimumSize(1050, 730)
+        self.resize(1320, 940)
+        self.setMinimumSize(1100, 820)
         shell = QWidget()
         self.setCentralWidget(shell)
-        layout = QHBoxLayout(shell)
+        layout = QVBoxLayout(shell)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        sidebar = QFrame()
-        sidebar.setObjectName("sidebar")
-        sidebar.setFixedWidth(220)
-        side = QVBoxLayout(sidebar)
-        side.setContentsMargins(10, 28, 10, 22)
-        brand = label("BSC / STUDIO", "brand")
-        brand.setContentsMargins(12, 0, 0, 0)
-        side.addWidget(brand)
-        caption = label("PODCASTS & RADIO", "eyebrow")
-        caption.setContentsMargins(13, 0, 0, 10)
-        side.addWidget(caption)
-        self.navigation = QListWidget()
-        self.navigation.addItems(["Épisodes", "Imports", "Studio", "Mises à jour", "Paramètres", "Modules BSC"])
-        side.addWidget(self.navigation)
-        side.addWidget(label("BREWERS SOCIAL CLUB", "eyebrow"))
-        side.addWidget(label(f"Version {__version__} · Windows x64", "hint"))
-        side.addWidget(button("Ouvrir mes données", self.open_data))
-        layout.addWidget(sidebar)
-        main = QVBoxLayout()
-        main.setContentsMargins(30, 28, 30, 20)
-        main.setSpacing(18)
-        self.heading = label("Vos épisodes", "heading")
+        layout.addWidget(BrandHeader())
+        self.navigation = BrandNavigation()
+        layout.addWidget(self.navigation)
+        workspace = QWidget()
+        workspace.setObjectName("workspace")
+        main = QVBoxLayout(workspace)
+        main.setContentsMargins(30, 23, 30, 16)
+        main.setSpacing(13)
+        self.heading = label("VOS ÉPISODES", "heading")
         self.subtitle = label("De l’information au podcast, dans un même espace.", "subheading", True)
-        main.addWidget(self.heading)
+        title_row = QHBoxLayout()
+        title_row.addWidget(self.heading, 1)
+        title_row.addWidget(label("BSC / STUDIO", "sectionTag"))
+        main.addLayout(title_row)
         main.addWidget(self.subtitle)
         self.pages = QStackedWidget()
         for build in (self.library_page, self.imports_page, self.editor_page, self.update_page, self.settings_page, self.modules_page):
@@ -178,8 +138,13 @@ class MainWindow(QMainWindow):
         self.progress.hide()
         self.status = label("Prêt · vos épisodes restent enregistrés sur ce PC.", "hint", True)
         main.addWidget(self.progress)
-        main.addWidget(self.status)
-        layout.addLayout(main, 1)
+        footer = QHBoxLayout()
+        footer.addWidget(self.status, 1)
+        files = button("Mes fichiers", self.open_data)
+        files.setObjectName("fileButton")
+        footer.addWidget(files)
+        main.addLayout(footer)
+        layout.addWidget(workspace, 1)
         self.player = QMediaPlayer(self)
         self.audio_output = QAudioOutput(self)
         self.audio_output.setVolume(0.8)
@@ -252,7 +217,7 @@ class MainWindow(QMainWindow):
         self.items_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         self.items_table.setColumnWidth(2, 230)
         box.addWidget(self.items_table, 1)
-        box.addLayout(self.row(button("Préparer l’émission →", lambda: self.navigation.setCurrentRow(2), True), button("Ajouter un exemple de démonstration", self.add_demo)))
+        box.addLayout(self.row(button("Préparer l’émission", lambda: self.navigation.setCurrentRow(2), True), button("Ajouter un exemple de démonstration", self.add_demo)))
         return page
 
     def editor_page(self):
@@ -267,7 +232,7 @@ class MainWindow(QMainWindow):
         box.addLayout(self.row(self.title_edit, self.format_combo))
         box.addLayout(self.row(button("Générer le dialogue avec GPT", self.generate_script, True), button("Brouillon sans API · démo", self.generate_demo), button("Enregistrer", self.save_episode)))
         self.script_table = QTableWidget(0, 2)
-        self.script_table.setHorizontalHeaderLabels(["Intervenant", "Dialogue"])
+        self.script_table.setHorizontalHeaderLabels(["INTERVENANT", "DIALOGUE"])
         self.script_table.setColumnWidth(0, 145)
         self.script_table.horizontalHeader().setStretchLastSection(True)
         self.script_table.verticalHeader().setDefaultSectionSize(105)
@@ -381,7 +346,7 @@ class MainWindow(QMainWindow):
                   ("Les mises à jour", "Suivez les versions publiées sur votre dépôt GitHub."),
                   ("Vos paramètres", "Modèles, voix et connexions pour ce PC."),
                   ("Brewers Social Club", "Une application qui s’étendra module après module.")]
-        self.heading.setText(titles[index][0])
+        self.heading.setText(titles[index][0].upper())
         self.subtitle.setText(titles[index][1])
         self.pages.setCurrentIndex(index)
 

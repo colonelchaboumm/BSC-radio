@@ -3,6 +3,11 @@
 Application Windows de création de podcasts au format radio pour Brewers Social Club.
 La première version inclut les imports, les dialogues, les voix OpenAI, les exports et les mises à jour GitHub.
 
+L’interface 0.1.1 reprend l’identité de brewerssocialclub.com : logo noir et blanc,
+bandeau violet à vagues, navigation blanche, typographie Roboto et accents turquoise/magenta.
+La [matrice de couverture fonctionnelle](docs/FUNCTIONAL_COVERAGE.md) indique les
+fonctions du moteur Houblon FM effectivement accessibles dans Windows et celles restant à intégrer.
+
 ## Installer
 
 Dans [Releases](https://github.com/colonelchaboumm/BSC-radio/releases), télécharger

@@ -20,7 +20,7 @@ def run():
             root = Path(directory)
             service = StudioService(root)
             service.import_text("Test local", "Les levures transforment les sucres pendant la fermentation. Ce contenu est une démonstration du logiciel.")
-            episode = service.generate_script("Test hors ligne", "journal", [service.items()[0]["id"]], lambda _: None, demo=True)
+            episode = service.generate_script("Démonstration du studio", "journal", [service.items()[0]["id"]], lambda _: None, demo=True)
             checks.append("SQLite, import, extraction et script de démonstration")
             application = QApplication.instance() or QApplication([])
             configure_fonts(application)

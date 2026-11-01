@@ -18,7 +18,7 @@ def test_only_newer_stable_versions(candidate, expected):
 
 
 def release_payload(data=b"MZinstaller", digest=None):
-    return {"tag_name": "v0.1.1", "assets": [{"id": 123, "name": ASSET_NAME, "state": "uploaded",
+    return {"tag_name": "v99.0.0", "assets": [{"id": 123, "name": ASSET_NAME, "state": "uploaded",
         "size": len(data), "digest": digest or "sha256:" + hashlib.sha256(data).hexdigest()}]}
 
 

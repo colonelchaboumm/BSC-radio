@@ -1,11 +1,12 @@
-Première version Windows x64 de BSC Radio Studio.
+Version 0.1.1 — interface Brewers Social Club.
 
-- Application et outils audio embarqués ; installation pour l’utilisateur courant.
-- Import de texte, fichiers TXT/Markdown, pages web et scripts JSON.
-- Sélection d’informations et création de dialogues avec OpenAI ; mode de démonstration sans API.
-- Édition par intervenant, prises vocales en cache, lecture et exports MP3/WAV/JSON.
-- Mise à jour par GitHub Releases du dépôt colonelchaboumm/BSC-radio, avec vérification SHA-256.
-- Identifiants chiffrés pour le compte Windows ; projets conservés lors des mises à jour et de la désinstallation.
+- Logo original noir et blanc, bandeau violet à vagues, navigation blanche et grands titres Roboto, d’après brewerssocialclub.com.
+- Accents turquoise et magenta, tableaux et zones de saisie adaptés au studio.
+- Navigation horizontale : épisodes, imports, studio, mises à jour, paramètres et modules BSC.
+- Police embarquée pour conserver le même rendu sur les autres PC Windows.
+- Documentation précise des fonctions Houblon FM disponibles et de celles restant à intégrer.
+
+Les projets, fichiers audio et identifiants sont conservés. Cette version apporte le nouveau design ; elle n’ajoute pas les fonctions serveur de collecte automatique, vérification éditoriale, habillage ou diffusion.
 
 Une clé API OpenAI est nécessaire pour les générations réelles. La disponibilité de la voix Rivage dans l’API n’est pas confirmée. Les modules du site BSC sont prévus pour de futures versions.
 

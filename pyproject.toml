@@ -1,6 +1,6 @@
 [project]
 name = "bsc-radio-studio"
-version = "0.1.0"
+version = "0.1.1"
 description = "Studio Windows de podcasts pour Brewers Social Club"
 requires-python = ">=3.12,<3.15"
 license = "AGPL-3.0-or-later"

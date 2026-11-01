@@ -17,3 +17,7 @@ Inno Setup est un outil de compilation externe : https://jrsoftware.org/.
 
 Sources complètes de l’application et historique des versions :
 https://github.com/colonelchaboumm/BSC-radio
+
+Identité visuelle : logo Brewers Social Club provenant de brewerssocialclub.com,
+conservé sous les droits de son propriétaire. La police Roboto est distribuée sous SIL
+Open Font License 1.1 ; voir assets/fonts/OFL-Roboto.txt dans les sources et l’application.
